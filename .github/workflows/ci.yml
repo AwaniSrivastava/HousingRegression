@@ -1,0 +1,41 @@
+# .github/workflows/ci.yml
+  name: CI Pipeline
+
+  on:
+    push:
+      branches:
+        - main
+        - reg_branch
+        - hyper_branch
+
+  jobs:
+    build-and-test:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' # Or the Python version you used (e.g., 3.8, 3.10)
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Regression Models (No Tuning) - on reg_branch or main after merge
+        # This step will run only if the script is designed to run non-tuned models by default
+        # or if it's explicitly called for that purpose.
+        # For this CI, we'll run the hyper-tuned version if available or the base version.
+        # Modify regression.py to accept an argument or environment variable if you need separate runs.
+        # For simplicity, we'll run the default behavior of regression.py (which will likely include tuning now)
+        run: python regression.py
+
+      - name: Upload Regression Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-results
+          path: regression_results.txt # Or hyper_results.txt based on your script logic
